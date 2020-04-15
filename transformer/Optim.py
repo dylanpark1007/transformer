@@ -1,8 +1,6 @@
-'''A wrapper class for optimizer '''
 import numpy as np
 
 class ScheduledOptim():
-    '''A simple wrapper class for learning rate scheduling'''
 
     def __init__(self, optimizer, d_model, n_warmup_steps):
         self._optimizer = optimizer
@@ -25,7 +23,6 @@ class ScheduledOptim():
             np.power(self.n_warmup_steps, -1.5) * self.n_current_steps])
 
     def _update_learning_rate(self):
-        ''' Learning rate scheduling per step '''
 
         self.n_current_steps += 1
         lr = self.init_lr * self._get_lr_scale()
