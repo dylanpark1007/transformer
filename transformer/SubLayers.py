@@ -1,13 +1,9 @@
-''' Define the sublayers in encoder/decoder layer '''
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from transformer.Modules import ScaledDotProductAttention
 
-__author__ = "Yu-Hsiang Huang"
-
 class MultiHeadAttention(nn.Module):
-    ''' Multi-Head Attention module '''
 
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
@@ -65,7 +61,6 @@ class MultiHeadAttention(nn.Module):
         return output, attn
 
 class PositionwiseFeedForward(nn.Module):
-    ''' A two-feed-forward-layer module '''
 
     def __init__(self, d_in, d_hid, dropout=0.1):
         super().__init__()
