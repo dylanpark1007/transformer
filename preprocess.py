@@ -1,10 +1,8 @@
-''' Handling the data io '''
 import argparse
 import torch
 import transformer.Constants as Constants
 
 def read_instances_from_file(inst_file, max_sent_len, keep_case):
-    ''' Convert file into word seq lists and vocab '''
 
     word_insts = []
     trimmed_sent_count = 0
@@ -31,7 +29,6 @@ def read_instances_from_file(inst_file, max_sent_len, keep_case):
     return word_insts
 
 def build_vocab_idx(word_insts, min_word_count):
-    ''' Trim vocab by number of occurence '''
 
     full_vocab = set(w for sent in word_insts for w in sent)
     print('[Info] Original Vocabulary size =', len(full_vocab))
@@ -62,11 +59,9 @@ def build_vocab_idx(word_insts, min_word_count):
     return word2idx
 
 def convert_instance_to_idx_seq(word_insts, word2idx):
-    ''' Mapping words to idx sequence. '''
     return [[word2idx.get(w, Constants.UNK) for w in s] for s in word_insts]
 
 def main():
-    ''' Main function '''
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-train_src', default='./data/multi30k/train.en' )
