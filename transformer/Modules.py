@@ -2,10 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-__author__ = "Yu-Hsiang Huang"
-
 class ScaledDotProductAttention(nn.Module):
-    ''' Scaled Dot-Product Attention '''
 
     def __init__(self, temperature, attn_dropout=0.1):
         super().__init__()
