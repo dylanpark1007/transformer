@@ -1,7 +1,3 @@
-'''
-This script handling the training process.
-'''
-
 import argparse
 import math
 import time
@@ -33,7 +29,6 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 
 def cal_performance(pred, gold, smoothing=False):
-    ''' Apply label smoothing if needed '''
 
     loss = cal_loss(pred, gold, smoothing)
     pred = pred.max(1)[1]
@@ -47,7 +42,6 @@ def cal_performance(pred, gold, smoothing=False):
 
 
 def cal_performance_bleu(pred, gold):
-    ''' Apply label smoothing if needed '''
 
     pred = pred.max(1)[1]
     gold = gold.contiguous().view(-1)
@@ -67,7 +61,6 @@ def cal_performance_bleu(pred, gold):
 
 
 def cal_loss(pred, gold, smoothing):
-    ''' Calculate cross entropy loss, apply label smoothing if needed. '''
 
     gold = gold.contiguous().view(-1)
 
@@ -92,7 +85,6 @@ def cal_loss(pred, gold, smoothing):
 
 
 def train_epoch(model, training_data, optimizer, device, smoothing):
-    ''' Epoch operation in training phase'''
 
     model.train()
 
@@ -119,7 +111,6 @@ def train_epoch(model, training_data, optimizer, device, smoothing):
         # update parameters
         optimizer.step_and_update_lr()
 
-        # note keeping
         total_loss += loss.item()
 
         non_pad_mask = gold.ne(Constants.PAD)
@@ -155,7 +146,6 @@ def eval_epoch(model, validation_data, device):
             loss, n_correct = cal_performance(pred, gold, smoothing=False)
             bleu_score = cal_performance_bleu(pred, gold)
 
-            # note keeping
             total_loss += loss.item()
 
             non_pad_mask = gold.ne(Constants.PAD)
@@ -171,7 +161,6 @@ def eval_epoch(model, validation_data, device):
     return loss_per_word, accuracy, n_bleu_score
 
 def train(model, training_data, validation_data, optimizer, device, opt):
-    ''' Start training '''
 
     log_train_file = None
     log_valid_file = None
@@ -269,7 +258,7 @@ def main():
     opt.cuda = not opt.no_cuda
     opt.d_word_vec = opt.d_model
 
-    #========= Loading Dataset =========#
+    # Loading Dataset
     data = torch.load(opt.data)
     opt.max_token_seq_len = data['settings'].max_token_seq_len
 
@@ -278,7 +267,7 @@ def main():
     opt.src_vocab_size = training_data.dataset.src_vocab_size
     opt.tgt_vocab_size = training_data.dataset.tgt_vocab_size
 
-    #========= Preparing Model =========#
+    # Preparing Model
     if opt.embs_share_weight:
         assert training_data.dataset.src_word2idx == training_data.dataset.tgt_word2idx, \
             'The src/tgt word2idx table are different but asked to share word embedding.'
@@ -311,7 +300,6 @@ def main():
 
 
 def prepare_dataloaders(data, opt):
-    # ========= Preparing DataLoader =========#
     # print(1,data['dict']['src'])
     # print(2,data['dict']['tgt'])
     # print(3,data['train']['src'])
