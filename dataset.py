@@ -11,7 +11,6 @@ def paired_collate_fn(insts):
     return (*src_insts, *tgt_insts)
 
 def collate_fn(insts):
-    ''' Pad the instance to the max seq length in batch '''
 
     max_len = max(len(inst) for inst in insts)
 
@@ -46,39 +45,25 @@ class TranslationDataset(torch.utils.data.Dataset):
         self._tgt_idx2word = tgt_idx2word
         self._tgt_insts = tgt_insts
 
-    @property
     def n_insts(self):
-        ''' Property for dataset size '''
         return len(self._src_insts)
 
-    @property
     def src_vocab_size(self):
-        ''' Property for vocab size '''
         return len(self._src_word2idx)
 
-    @property
     def tgt_vocab_size(self):
-        ''' Property for vocab size '''
         return len(self._tgt_word2idx)
 
-    @property
     def src_word2idx(self):
-        ''' Property for word dictionary '''
         return self._src_word2idx
 
-    @property
     def tgt_word2idx(self):
-        ''' Property for word dictionary '''
         return self._tgt_word2idx
 
-    @property
     def src_idx2word(self):
-        ''' Property for index dictionary '''
         return self._src_idx2word
 
-    @property
     def tgt_idx2word(self):
-        ''' Property for index dictionary '''
         return self._tgt_idx2word
 
     def __len__(self):
