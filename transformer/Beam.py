@@ -1,16 +1,12 @@
-""" Manage beam search info structure.
 
-    Heavily borrowed from OpenNMT-py.
-    For code in OpenNMT-py, please check the following link:
-    https://github.com/OpenNMT/OpenNMT-py/blob/master/onmt/Beam.py
-"""
 
 import torch
 import numpy as np
 import transformer.Constants as Constants
 
+# From https://github.com/OpenNMT/OpenNMT-py/blob/master/onmt/Beam.py
+
 class Beam():
-    ''' Beam search '''
 
     def __init__(self, size, device=False):
 
@@ -36,7 +32,6 @@ class Beam():
         "Get the backpointers for the current timestep."
         return self.prev_ks[-1]
 
-    @property
     def done(self):
         return self._done
 
