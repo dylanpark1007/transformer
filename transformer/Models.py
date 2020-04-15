@@ -1,4 +1,3 @@
-''' Define the Transformer model '''
 import torch
 import torch.nn as nn
 import numpy as np
@@ -6,14 +5,14 @@ import transformer.Constants as Constants
 from transformer.Layers import EncoderLayer, DecoderLayer
 torch.set_printoptions(edgeitems=40, linewidth=80)
 
-__author__ = "Yu-Hsiang Huang"
+
+# Define the Transformer model
 
 def get_non_pad_mask(seq):
     assert seq.dim() == 2
     return seq.ne(Constants.PAD).type(torch.float).unsqueeze(-1)
 
 def get_sinusoid_encoding_table(n_position, d_hid, padding_idx=None):
-    ''' Sinusoid position encoding table '''
 
     def cal_angle(position, hid_idx):
         return position / np.power(10000, 2 * (hid_idx // 2) / d_hid)
@@ -33,9 +32,7 @@ def get_sinusoid_encoding_table(n_position, d_hid, padding_idx=None):
     return torch.FloatTensor(sinusoid_table)
 
 def get_attn_key_pad_mask(seq_k, seq_q):
-    ''' For masking out the padding part of key sequence. '''
 
-    # Expand to fit the shape of key query attention matrix.
     len_q = seq_q.size(1)
     padding_mask = seq_k.eq(Constants.PAD)
     padding_mask = padding_mask.unsqueeze(1).expand(-1, len_q, -1)  # b x lq x lk
@@ -43,7 +40,6 @@ def get_attn_key_pad_mask(seq_k, seq_q):
     return padding_mask
 
 def get_subsequent_mask(seq):
-    ''' For masking out the subsequent info. '''
 
     sz_b, len_s = seq.size()
     subsequent_mask = torch.triu(
@@ -53,7 +49,6 @@ def get_subsequent_mask(seq):
     return subsequent_mask
 
 class Encoder(nn.Module):
-    ''' A encoder model with self attention mechanism. '''
 
     def __init__(
             self,
@@ -80,12 +75,12 @@ class Encoder(nn.Module):
 
         enc_slf_attn_list = []
 
-        # -- Prepare masks
+        # Prepare masks
         slf_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=src_seq)
         non_pad_mask = get_non_pad_mask(src_seq)
 
 
-        # -- Forward
+        # Forward
         enc_output = self.src_word_emb(src_seq) + self.position_enc(src_pos)
 
         for enc_layer in self.layer_stack:
@@ -101,7 +96,6 @@ class Encoder(nn.Module):
         return enc_output,
 
 class Decoder(nn.Module):
-    ''' A decoder model with self attention mechanism. '''
 
     def __init__(
             self,
@@ -127,7 +121,7 @@ class Decoder(nn.Module):
 
         dec_slf_attn_list, dec_enc_attn_list = [], []
 
-        # -- Prepare masks
+        # Prepare masks
         non_pad_mask = get_non_pad_mask(tgt_seq)
 
         slf_attn_mask_subseq = get_subsequent_mask(tgt_seq)
@@ -136,7 +130,7 @@ class Decoder(nn.Module):
 
         dec_enc_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=tgt_seq)
 
-        # -- Forward
+        # Forward
         dec_output = self.tgt_word_emb(tgt_seq) + self.position_enc(tgt_pos)
 
         for dec_layer in self.layer_stack:
@@ -155,7 +149,6 @@ class Decoder(nn.Module):
         return dec_output,
 
 class Transformer(nn.Module):
-    ''' A sequence to sequence model with attention mechanism. '''
 
     def __init__(
             self,
@@ -182,22 +175,15 @@ class Transformer(nn.Module):
         self.tgt_word_prj = nn.Linear(d_model, n_tgt_vocab, bias=False)
         nn.init.xavier_normal_(self.tgt_word_prj.weight)
 
-        assert d_model == d_word_vec, \
-        'To facilitate the residual connections, \
-         the dimensions of all module outputs shall be the same.'
-
         if tgt_emb_prj_weight_sharing:
-            # Share the weight matrix between target word embedding & the final logit dense layer
+            # Share the weight matrix between target word embedding
             self.tgt_word_prj.weight = self.decoder.tgt_word_emb.weight
             self.x_logit_scale = (d_model ** -0.5)
         else:
             self.x_logit_scale = 1.
 
         if emb_src_tgt_weight_sharing:
-            # Share the weight matrix between source & target word embeddings
-            assert n_src_vocab == n_tgt_vocab, \
-            "To share word embedding table, the vocabulary size of src/tgt shall be the same."
-            self.encoder.src_word_emb.weight = self.decoder.tgt_word_emb.weight
+            # Share the weight matrix between source
 
     def forward(self, src_seq, src_pos, tgt_seq, tgt_pos):
 
